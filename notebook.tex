@@ -141,7 +141,7 @@
     \def\gt{>}
     \def\lt{<}
     % Document parameters
-    \title{Pershyn\_Electric\_Vehicles}
+    \title{Project\_Questions}
     
     
     
@@ -280,142 +280,739 @@
     
 
     
-    \section{Where Should There Be More Electric Charging Hubs in New York
-State?}\label{where-should-there-be-more-electric-charging-hubs-in-new-york-state}
+    \section{Electric Vehicle Data}\label{electric-vehicle-data}
 
-\subsubsection{Cecilia Pershyn}\label{cecilia-pershyn}
+Objective: To create a dataframe with "Region" and "Number of Vehicles"
 
-\paragraph{CIS512}\label{cis512}
+Workflow\_1:\\
+1. From "vehicle\_reg", extract "County" column.\\
+2. Use groupby and .agg, count, .sort\_values() to create a new column
+in the dataframe which gives the \# of EV registered in each county\\
+3. Upload "region" data. Take only the "region" and "county". Convert
+all the "county" values to uppercase.\\
+4. Merge "count\_county" and "region". Output: a dataframe called
+"veh\_count\_reg" with "region" "county" and "number of vehicles"
+\textgreater{}\textgreater{}This method does not work, the table is
+riddled with NaN. \textbf{Question1: How might I be able to join this
+dataframe and get rid of NaN values?} 5. Create a new dataframe with
+"region" and "number of vehicles" 5. Use groupby and .agg, count,
+.sort\_values() to create a new column in "veh\_count\_reg" which gives
+the \# of EV registered in each region
 
-New York State is a leading state in clean and renewable energy, with a
-commitment to have 50\% of the state's electricity supplied by renewable
-sources by 2030. Thanks to impressive growth in solar, wind, hydro and
-biomass power in New York State, plug-in electric vehicles (EVs) have
-particularly low greenhouse gas emissions here.
-
-EVs are a cheap and clean alternative to gas-fueled vehicles. However,
-small battery storage capacity limits the amount of electric fuel that
-can be carried on board the vehicle. In order to make the use of EVs
-more convenient, and help extend vehicle mileage, there is a need to
-expand the electric power grid and create more public fueling stations.
-
-In this study I will look at vehicle registrations in NYS to determine
-where electric vehicles are registered. I will look at where charging
-ports are located in the state and compare to the zip codes with high
-electric vehicle registrations to determine which zip codes have the
-highest demand for new charging ports.
-
-Data Sources:
-
-Data on Charging Stations
-https://data.ny.gov/d/7rrd-248n?category=Energy-Environment\&view\_name=Electric-Vehicle-Charging-Stations-in-New-York
-
-Data on Electric Vehicle Registration\\
-https://data.ny.gov/d/uu25-czyc?category=Transportation\&view\_name=Electric-Vehicles-per-County
-
-Bibliography:
-
-How New York Uses Renewable Energy. (n.d.). Retrieved from
-http://www.dec.ny.gov/energy/83070.html\\
-Date Visited: 10/29/18
-
-How New York Uses Renewable Energy. (n.d.). Retrieved from
-http://www.dec.ny.gov/energy/83070.html\\
-Date Visited: 10/29/18
+\emph{Edit - I make some changes to this workflow as I work through the
+problem.}\\
+Workflow\_2:\\
+1. From "vehicle\_reg", extract "County" column.\\
+2. Upload "region" data. Take only the "region" and "county". Convert
+all the "county" values to uppercase.\\
+3. Merge "County" and "region". Output: ideally, a dataframe called
+"count\_reg" although at the moment, "Albany" occurs numerous times, but
+"Capital" occurs under region just once, and NaN occurs every time after
+that. \textbf{Question 2: how do I return a region for every row that
+county appears?} 4. Once I work out how to have a region for every
+county entry, I can do a groupby in a similar fashion to my method in
+Workflow\_1, but this time with regions. Output: \# of vehicles and
+regions
 
     \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}29}]:} \PY{o}{\PYZpc{}}\PY{k}{matplotlib} inline
-         
+{\color{incolor}In [{\color{incolor}80}]:} \PY{o}{\PYZpc{}}\PY{k}{matplotlib} inline
          \PY{k+kn}{import} \PY{n+nn}{pandas} \PY{k}{as} \PY{n+nn}{pd}
          \PY{k+kn}{import} \PY{n+nn}{numpy} \PY{k}{as} \PY{n+nn}{np}
          \PY{k+kn}{import} \PY{n+nn}{matplotlib}\PY{n+nn}{.}\PY{n+nn}{pyplot} \PY{k}{as} \PY{n+nn}{plt}
          \PY{k+kn}{import} \PY{n+nn}{seaborn} \PY{k}{as} \PY{n+nn}{sns}\PY{p}{;} \PY{n}{sns}\PY{o}{.}\PY{n}{set}\PY{p}{(}\PY{p}{)}
-         
          \PY{n}{sns}\PY{o}{.}\PY{n}{set}\PY{p}{(}\PY{n}{style}\PY{o}{=}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{darkgrid}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
 \end{Verbatim}
 
 
-    \subsubsection{Electric Vehicle Registration
-Data}\label{electric-vehicle-registration-data}
-
-\emph{Import and read data table}
-
     \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor} }]:} \PY{n}{vehicle\PYZus{}reg} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{read\PYZus{}csv}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Vehicle\PYZus{}\PYZus{}Snowmobile\PYZus{}\PYZus{}and\PYZus{}Boat\PYZus{}Registrations.csv}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
-\end{Verbatim}
-
-
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}3}]:} \PY{n}{vehicle\PYZus{}reg}\PY{o}{.}\PY{n}{head}\PY{p}{(}\PY{p}{)}
+{\color{incolor}In [{\color{incolor}81}]:} \PY{c+c1}{\PYZsh{}upload data}
+         \PY{n}{vehicle\PYZus{}reg} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{read\PYZus{}csv}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Vehicle\PYZus{}\PYZus{}Snowmobile\PYZus{}\PYZus{}and\PYZus{}Boat\PYZus{}Registrations.csv}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+         \PY{n}{vehicle\PYZus{}reg}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{5}\PY{p}{]}
 \end{Verbatim}
 
 
 \begin{Verbatim}[commandchars=\\\{\}]
-{\color{outcolor}Out[{\color{outcolor}3}]:}   Record Type                VIN Registration Class             City State  \textbackslash{}
-        0        VEH   8995                             PAS  BUFFALO            NY   
-        1        VEH   607SR2131A                       PAS  N SYRACUSE         NY   
-        2        VEH   537LS7D46CT083476                PAS  NEWFANE            NY   
-        3        VEH   53TBH2MC1BE900166                PAS  ROCKVILLE CTR      NY   
-        4        VEH   53G1B4A47DB000347                PAS  BROOKLYN           NY   
-        
-             Zip        County  Model Year   Make Body Type Fuel Type  Unladen Weight  \textbackslash{}
-        0  14207  ERIE                1913  DE/EL      2DSD  ELECTRIC            1100   
-        1  13212  ONONDAGA            1977  CITI       2DSD  ELECTRIC            2590   
-        2  14108  NIAGARA             2012  AZURE      SUBN  ELECTRIC            4005   
-        3  11570  NASSAU              2011  THINK      2DSD  ELECTRIC            2348   
-        4  11223  KINGS               2013  CODA       4DSD  ELECTRIC            3682   
-        
-           Maximum Gross Weight  Passengers Reg Valid Date Reg Expiration Date  Color  \textbackslash{}
-        0                   NaN         NaN     05/31/2018          07/01/2020  MR      
-        1                   NaN         NaN     11/21/2017          11/20/2019  RD      
-        2                   NaN         NaN     05/16/2017          05/17/2019  WH      
-        3                   NaN         NaN     04/18/2018          05/06/2020  RD      
-        4                   NaN         NaN     08/08/2018          08/07/2020  BK      
-        
-          Scofflaw Indicator Suspension Indicator Revocation Indicator  
-        0                  N                    N                    N  
-        1                  N                    N                    N  
-        2                  N                    N                    N  
-        3                  N                    N                    N  
-        4                  N                    N                    N  
+{\color{outcolor}Out[{\color{outcolor}81}]:}   Record Type                VIN Registration Class             City State  \textbackslash{}
+         0        VEH   8995                             PAS  BUFFALO            NY   
+         1        VEH   607SR2131A                       PAS  N SYRACUSE         NY   
+         2        VEH   537LS7D46CT083476                PAS  NEWFANE            NY   
+         3        VEH   53TBH2MC1BE900166                PAS  ROCKVILLE CTR      NY   
+         4        VEH   53G1B4A47DB000347                PAS  BROOKLYN           NY   
+         
+              Zip        County  Model Year   Make Body Type Fuel Type  Unladen Weight  \textbackslash{}
+         0  14207  ERIE                1913  DE/EL      2DSD  ELECTRIC            1100   
+         1  13212  ONONDAGA            1977  CITI       2DSD  ELECTRIC            2590   
+         2  14108  NIAGARA             2012  AZURE      SUBN  ELECTRIC            4005   
+         3  11570  NASSAU              2011  THINK      2DSD  ELECTRIC            2348   
+         4  11223  KINGS               2013  CODA       4DSD  ELECTRIC            3682   
+         
+            Maximum Gross Weight  Passengers Reg Valid Date Reg Expiration Date  Color  \textbackslash{}
+         0                   NaN         NaN     05/31/2018          07/01/2020  MR      
+         1                   NaN         NaN     11/21/2017          11/20/2019  RD      
+         2                   NaN         NaN     05/16/2017          05/17/2019  WH      
+         3                   NaN         NaN     04/18/2018          05/06/2020  RD      
+         4                   NaN         NaN     08/08/2018          08/07/2020  BK      
+         
+           Scofflaw Indicator Suspension Indicator Revocation Indicator  
+         0                  N                    N                    N  
+         1                  N                    N                    N  
+         2                  N                    N                    N  
+         3                  N                    N                    N  
+         4                  N                    N                    N  
 \end{Verbatim}
             
-    \emph{Create a new table with only the relevant information to my study}
-
     \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}4}]:} \PY{n}{veh} \PY{o}{=} \PY{n}{vehicle\PYZus{}reg}\PY{p}{[}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{City}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{State}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Zip}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{County}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{]}
-        \PY{n}{veh}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{5}\PY{p}{]}
+{\color{incolor}In [{\color{incolor}136}]:} \PY{c+c1}{\PYZsh{}Create a new df with only the counties for each registration}
+          \PY{n}{county1} \PY{o}{=} \PY{n}{vehicle\PYZus{}reg}\PY{p}{[}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{County}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{]}
+          \PY{n}{county1}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{5}\PY{p}{]}
+          \PY{c+c1}{\PYZsh{}rename so it is easier to join later}
+          \PY{c+c1}{\PYZsh{}county1.columns = [\PYZsq{}County\PYZsq{}]}
+          \PY{c+c1}{\PYZsh{}county1[:5]}
 \end{Verbatim}
 
 
 \begin{Verbatim}[commandchars=\\\{\}]
-{\color{outcolor}Out[{\color{outcolor}4}]:}               City State    Zip        County
-        0  BUFFALO            NY  14207  ERIE        
-        1  N SYRACUSE         NY  13212  ONONDAGA    
-        2  NEWFANE            NY  14108  NIAGARA     
-        3  ROCKVILLE CTR      NY  11570  NASSAU      
-        4  BROOKLYN           NY  11223  KINGS       
+{\color{outcolor}Out[{\color{outcolor}136}]:}          County
+          0  ERIE        
+          1  ONONDAGA    
+          2  NIAGARA     
+          3  NASSAU      
+          4  KINGS       
 \end{Verbatim}
             
-    \emph{There are 9222 registered electric vehicles in NYS}
-
     \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}30}]:} \PY{n+nb}{len}\PY{p}{(}\PY{n}{veh}\PY{p}{)}
+{\color{incolor}In [{\color{incolor}137}]:} \PY{c+c1}{\PYZsh{}use groupby to organize the counties, then count how many times a couny appears in df}
+          \PY{c+c1}{\PYZsh{}Add a column for the number of times a county shows up in the df. This is the number of EV registered in the county}
+          \PY{n}{county}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Number of Vehicles}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{\PYZsq{}}
+          \PY{n}{reg\PYZus{}county} \PY{o}{=} \PY{n}{county}\PY{o}{.}\PY{n}{groupby}\PY{p}{(}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{County}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} \PY{n}{as\PYZus{}index} \PY{o}{=} \PY{k+kc}{False}\PY{p}{)}
+          \PY{n}{count\PYZus{}county} \PY{o}{=} \PY{n}{reg\PYZus{}county}\PY{o}{.}\PY{n}{agg}\PY{p}{(}\PY{p}{\PYZob{}}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Number of Vehicles}\PY{l+s+s1}{\PYZsq{}}\PY{p}{:}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{count}\PY{l+s+s1}{\PYZsq{}}\PY{p}{\PYZcb{}}\PY{p}{)}\PY{o}{.}\PY{n}{sort\PYZus{}values}\PY{p}{(}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Number of Vehicles}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{County}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} \PY{n}{ascending}\PY{o}{=}\PY{p}{[}\PY{k+kc}{False}\PY{p}{,} \PY{k+kc}{True}\PY{p}{]}\PY{p}{)}
+          \PY{n}{count\PYZus{}county}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{5}\PY{p}{]}
 \end{Verbatim}
 
 
 \begin{Verbatim}[commandchars=\\\{\}]
-{\color{outcolor}Out[{\color{outcolor}30}]:} 9222
+{\color{outcolor}Out[{\color{outcolor}137}]:}           County  Number of Vehicles
+          59  WESTCHESTER                 1577
+          28  NASSAU                      1486
+          51  SUFFOLK                     1196
+          29  NEW YORK                     875
+          40  QUEENS                       456
 \end{Verbatim}
             
-    \emph{Create a data series showing the number of electric vehicles per
-zip code in New York State}
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}138}]:} \PY{c+c1}{\PYZsh{}import Region data}
+          \PY{k+kn}{from} \PY{n+nn}{pandas} \PY{k}{import} \PY{n}{DataFrame}
+          \PY{n}{region} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{read\PYZus{}excel}\PY{p}{(}\PY{l+s+sa}{r}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{/Users/ceciliapershyn/CIS\PYZus{}512\PYZus{}Term\PYZus{}Project/county\PYZus{}to\PYZus{}region.xlsx}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+          \PY{n}{region} \PY{o}{=} \PY{n}{DataFrame}\PY{p}{(}\PY{n}{region}\PY{p}{,} \PY{n}{columns}\PY{o}{=}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Region\PYZus{}Code}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Region}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{County}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{)}
+          \PY{n}{region}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{5}\PY{p}{]}
+\end{Verbatim}
+
+
+\begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}138}]:}    Region\_Code         Region    County
+          0            1    Long Island    Nassau
+          1            1    Long Island   Suffolk
+          2            2  New York City     Kings
+          3            2  New York City     Bronx
+          4            2  New York City  New York
+\end{Verbatim}
+            
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}139}]:} \PY{c+c1}{\PYZsh{}convert County column to uppercase so it will match the County columns in other tables after join}
+          \PY{n}{region}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{County}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{region}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{County}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{.}\PY{n}{str}\PY{o}{.}\PY{n}{upper}\PY{p}{(}\PY{p}{)}
+          \PY{n}{region}\PY{o}{.}\PY{n}{rename}\PY{p}{(}\PY{n}{index}\PY{o}{=}\PY{n+nb}{str}\PY{p}{,} \PY{n}{columns}\PY{o}{=}\PY{p}{\PYZob{}}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{County}\PY{l+s+s2}{\PYZdq{}}\PY{p}{:} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{county}\PY{l+s+s2}{\PYZdq{}}\PY{p}{\PYZcb{}}\PY{p}{)}
+          \PY{n}{region}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{5}\PY{p}{]}
+\end{Verbatim}
+
+
+\begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}139}]:}    Region\_Code         Region    County
+          0            1    Long Island    NASSAU
+          1            1    Long Island   SUFFOLK
+          2            2  New York City     KINGS
+          3            2  New York City     BRONX
+          4            2  New York City  NEW YORK
+\end{Verbatim}
+            
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}140}]:} \PY{c+c1}{\PYZsh{}remove Region\PYZus{}Code}
+          \PY{n}{region} \PY{o}{=} \PY{n}{region}\PY{p}{[}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{County}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Region}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{]}
+          \PY{n}{region}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{5}\PY{p}{]}
+\end{Verbatim}
+
+
+\begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}140}]:}      County         Region
+          0    NASSAU    Long Island
+          1   SUFFOLK    Long Island
+          2     KINGS  New York City
+          3     BRONX  New York City
+          4  NEW YORK  New York City
+\end{Verbatim}
+            
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}141}]:} \PY{c+c1}{\PYZsh{}1st attempt to join}
+          \PY{n}{veh\PYZus{}count\PYZus{}reg} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{merge\PYZus{}ordered}\PY{p}{(}\PY{n}{count\PYZus{}county}\PY{p}{,} \PY{n}{region}\PY{p}{,} \PY{n}{on}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{County}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{fill\PYZus{}method}\PY{o}{=}\PY{k+kc}{None}\PY{p}{,} \PY{n}{how}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{outer}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+          \PY{n}{veh\PYZus{}count\PYZus{}reg}
+          
+          \PY{c+c1}{\PYZsh{}Question1: How might I be able to join this dataframe and get rid of NaN values?}
+          
+          \PY{c+c1}{\PYZsh{}Edit: further down in the notebook I realize that it would be}
+          \PY{c+c1}{\PYZsh{}a better strategy to add the county to the region table before}
+          \PY{c+c1}{\PYZsh{}doing the group by.  This way, I can groupby the region }
+          \PY{c+c1}{\PYZsh{}and get the number of vehicles per region(see below for example)}
+\end{Verbatim}
+
+
+\begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}141}]:}            County  Number of Vehicles                Region
+          0          ALBANY                 NaN        Capital Region
+          1    ALBANY                     226.0                   NaN
+          2        ALLEGANY                 NaN      Western New York
+          3    ALLEGANY                     2.0                   NaN
+          4           BRONX                 NaN         New York City
+          5    BRONX                       77.0                   NaN
+          6          BROOME                 NaN      Central New York
+          7    BROOME                      45.0                   NaN
+          8     CATTARAUGUS                 NaN      Western New York
+          9    CATTARAUGUS                  7.0                   NaN
+          10         CAYUGA                 NaN      Central New York
+          11   CAYUGA                      13.0                   NaN
+          12     CHAUTAUQUA                 NaN      Western New York
+          13   CHAUTAUQUA                  16.0                   NaN
+          14        CHEMUNG                 NaN  Western Finger Lakes
+          15   CHEMUNG                     21.0                   NaN
+          16       CHENANGO                 NaN      Central New York
+          17   CHENANGO                     7.0                   NaN
+          18        CLINTON                 NaN   Eastern Adirondacks
+          19   CLINTON                     21.0                   NaN
+          20       COLUMBIA                 NaN        Capital Region
+          21   COLUMBIA                    31.0                   NaN
+          22       CORTLAND                 NaN      Central New York
+          23   CORTLAND                     7.0                   NaN
+          24       DELAWARE                 NaN        Capital Region
+          25   DELAWARE                     9.0                   NaN
+          26       DUTCHESS                 NaN   Lower Hudson Valley
+          27   DUTCHESS                   202.0                   NaN
+          28           ERIE                 NaN      Western New York
+          29   ERIE                       283.0                   NaN
+          ..            {\ldots}                 {\ldots}                   {\ldots}
+          94       SCHUYLER                 NaN  Western Finger Lakes
+          95   SCHUYLER                     8.0                   NaN
+          96         SENECA                 NaN  Western Finger Lakes
+          97   SENECA                       6.0                   NaN
+          98   ST LAWRENCE                  9.0                   NaN
+          99   ST. LAWRENCE                 NaN   Western Adirondacks
+          100       STEUBEN                 NaN  Western Finger Lakes
+          101  STEUBEN                     24.0                   NaN
+          102       SUFFOLK                 NaN           Long Island
+          103  SUFFOLK                   1196.0                   NaN
+          104      SULLIVAN                 NaN   Lower Hudson Valley
+          105  SULLIVAN                    21.0                   NaN
+          106          TIOA                 NaN      Central New York
+          107  TIOGA                       11.0                   NaN
+          108      TOMPKINS                 NaN      Central New York
+          109  TOMPKINS                   113.0                   NaN
+          110        ULSTER                 NaN   Lower Hudson Valley
+          111  ULSTER                     156.0                   NaN
+          112        WARREN                 NaN   Eastern Adirondacks
+          113  WARREN                      26.0                   NaN
+          114    WASHINGTON                 NaN   Eastern Adirondacks
+          115  WASHINGTON                  15.0                   NaN
+          116         WAYNE                 NaN  Western Finger Lakes
+          117  WAYNE                       15.0                   NaN
+          118   WESTCHESTER                 NaN   Lower Hudson Valley
+          119  WESTCHESTER               1577.0                   NaN
+          120       WYOMING                 NaN      Western New York
+          121  WYOMING                      3.0                   NaN
+          122         YATES                 NaN  Western Finger Lakes
+          123  YATES                        3.0                   NaN
+          
+          [124 rows x 3 columns]
+\end{Verbatim}
+            
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}142}]:} \PY{c+c1}{\PYZsh{}I\PYZsq{}m creating a sample dataframe as an example of the output}
+          \PY{c+c1}{\PYZsh{}I am trying to achieve}
+          
+          \PY{n}{sample} \PY{o}{=} \PY{p}{\PYZob{}}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{County}\PY{l+s+s1}{\PYZsq{}}\PY{p}{:}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Albany}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Allegany}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Columbia}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}  \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Cattaragus}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Clinton}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Erie}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} 
+                    \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{\PYZsh{} of Veh}\PY{l+s+s1}{\PYZsq{}}\PY{p}{:}\PY{p}{[}\PY{l+m+mi}{226}\PY{p}{,} \PY{l+m+mi}{2}\PY{p}{,} \PY{l+m+mi}{31}\PY{p}{,} \PY{l+m+mi}{7}\PY{p}{,} \PY{l+m+mi}{21}\PY{p}{,} \PY{l+m+mi}{283}\PY{p}{]}\PY{p}{,} 
+                    \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Region}\PY{l+s+s1}{\PYZsq{}}\PY{p}{:}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Capital}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{WNY}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Capital}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{WNY}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Eastern ADK}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{WNY}\PY{l+s+s1}{\PYZsq{}} \PY{p}{]}\PY{p}{\PYZcb{}}
+          \PY{n}{sample\PYZus{}veh\PYZus{}reg\PYZus{}count} \PY{o}{=} \PY{n}{DataFrame} \PY{p}{(}\PY{n}{sample}\PY{p}{,} \PY{n}{columns} \PY{o}{=} \PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{County}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{\PYZsh{} of Veh}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Region}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{)}
+          \PY{n}{sample\PYZus{}veh\PYZus{}reg\PYZus{}count}
+\end{Verbatim}
+
+
+\begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}142}]:}        County  \# of Veh       Region
+          0      Albany       226      Capital
+          1    Allegany         2          WNY
+          2    Columbia        31      Capital
+          3  Cattaragus         7          WNY
+          4     Clinton        21  Eastern ADK
+          5        Erie       283          WNY
+\end{Verbatim}
+            
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}143}]:} \PY{c+c1}{\PYZsh{}The next step is to add together all the vehicles in each region}
+          \PY{n}{sample\PYZus{}veh\PYZus{}reg} \PY{o}{=} \PY{n}{sample\PYZus{}veh\PYZus{}reg\PYZus{}count}\PY{p}{[}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{\PYZsh{} of Veh}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Region}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{]}
+          \PY{n}{sample\PYZus{}veh\PYZus{}reg}
+\end{Verbatim}
+
+
+\begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}143}]:}    \# of Veh       Region
+          0       226      Capital
+          1         2          WNY
+          2        31      Capital
+          3         7          WNY
+          4        21  Eastern ADK
+          5       283          WNY
+\end{Verbatim}
+            
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}144}]:} \PY{n}{sample\PYZus{}veh\PYZus{}reg} \PY{o}{=} \PY{n}{sample\PYZus{}veh\PYZus{}reg}\PY{o}{.}\PY{n}{groupby}\PY{p}{(}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Region}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} \PY{n}{as\PYZus{}index} \PY{o}{=} \PY{k+kc}{False}\PY{p}{)}
+          \PY{n}{sample\PYZus{}total\PYZus{}veh\PYZus{}region} \PY{o}{=} \PY{n}{sample\PYZus{}veh\PYZus{}reg}\PY{o}{.}\PY{n}{agg}\PY{p}{(}\PY{p}{\PYZob{}}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{\PYZsh{} of Veh}\PY{l+s+s1}{\PYZsq{}}\PY{p}{:}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{count}\PY{l+s+s1}{\PYZsq{}}\PY{p}{\PYZcb{}}\PY{p}{)}\PY{o}{.}\PY{n}{sort\PYZus{}values}\PY{p}{(}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{\PYZsh{} of Veh}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Region}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} \PY{n}{ascending}\PY{o}{=}\PY{p}{[}\PY{k+kc}{False}\PY{p}{,} \PY{k+kc}{True}\PY{p}{]}\PY{p}{)}
+          \PY{n}{sample\PYZus{}total\PYZus{}veh\PYZus{}region}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{5}\PY{p}{]}
+          
+          \PY{c+c1}{\PYZsh{}So this is just showing the number of times the region shows }
+          \PY{c+c1}{\PYZsh{}up in the dataframe, which is not what I am looking for}
+\end{Verbatim}
+
+
+\begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}144}]:}         Region  \# of Veh
+          2          WNY         3
+          0      Capital         2
+          1  Eastern ADK         1
+\end{Verbatim}
+            
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}147}]:} \PY{c+c1}{\PYZsh{}Maybe I should try to add the county to the region table BEFORE}
+          \PY{c+c1}{\PYZsh{}doing the initial groupby (which produces the \PYZsh{} of vehicles/county).}
+          \PY{c+c1}{\PYZsh{}This way, I can do the group by on regions instead of counties}
+          
+          \PY{n}{veh\PYZus{}count\PYZus{}reg} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{merge\PYZus{}ordered}\PY{p}{(}\PY{n}{county1}\PY{p}{,} \PY{n}{region}\PY{p}{,} \PY{n}{on}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{County}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{fill\PYZus{}method}\PY{o}{=}\PY{k+kc}{None}\PY{p}{,} \PY{n}{how}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{outer}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+          \PY{n}{veh\PYZus{}count\PYZus{}reg}
+          
+          \PY{c+c1}{\PYZsh{}The result is the region only shows up one time,}
+          \PY{c+c1}{\PYZsh{}the first time the county shows up in the dataframe}
+          \PY{c+c1}{\PYZsh{}How do i get it to match so that every time Albany appears in the}
+          \PY{c+c1}{\PYZsh{}dataframe, it is matched with \PYZdq{}Capital Region\PYZdq{}?}
+\end{Verbatim}
+
+
+\begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}147}]:}             County                Region
+          0           ALBANY        Capital Region
+          1     ALBANY                         NaN
+          2     ALBANY                         NaN
+          3     ALBANY                         NaN
+          4     ALBANY                         NaN
+          5     ALBANY                         NaN
+          6     ALBANY                         NaN
+          7     ALBANY                         NaN
+          8     ALBANY                         NaN
+          9     ALBANY                         NaN
+          10    ALBANY                         NaN
+          11    ALBANY                         NaN
+          12    ALBANY                         NaN
+          13    ALBANY                         NaN
+          14    ALBANY                         NaN
+          15    ALBANY                         NaN
+          16    ALBANY                         NaN
+          17    ALBANY                         NaN
+          18    ALBANY                         NaN
+          19    ALBANY                         NaN
+          20    ALBANY                         NaN
+          21    ALBANY                         NaN
+          22    ALBANY                         NaN
+          23    ALBANY                         NaN
+          24    ALBANY                         NaN
+          25    ALBANY                         NaN
+          26    ALBANY                         NaN
+          27    ALBANY                         NaN
+          28    ALBANY                         NaN
+          29    ALBANY                         NaN
+          {\ldots}            {\ldots}                   {\ldots}
+          9254  WESTCHESTER                    NaN
+          9255  WESTCHESTER                    NaN
+          9256  WESTCHESTER                    NaN
+          9257  WESTCHESTER                    NaN
+          9258  WESTCHESTER                    NaN
+          9259  WESTCHESTER                    NaN
+          9260  WESTCHESTER                    NaN
+          9261  WESTCHESTER                    NaN
+          9262  WESTCHESTER                    NaN
+          9263  WESTCHESTER                    NaN
+          9264  WESTCHESTER                    NaN
+          9265  WESTCHESTER                    NaN
+          9266  WESTCHESTER                    NaN
+          9267  WESTCHESTER                    NaN
+          9268  WESTCHESTER                    NaN
+          9269  WESTCHESTER                    NaN
+          9270  WESTCHESTER                    NaN
+          9271  WESTCHESTER                    NaN
+          9272  WESTCHESTER                    NaN
+          9273  WESTCHESTER                    NaN
+          9274  WESTCHESTER                    NaN
+          9275  WESTCHESTER                    NaN
+          9276       WYOMING      Western New York
+          9277  WYOMING                        NaN
+          9278  WYOMING                        NaN
+          9279  WYOMING                        NaN
+          9280         YATES  Western Finger Lakes
+          9281  YATES                          NaN
+          9282  YATES                          NaN
+          9283  YATES                          NaN
+          
+          [9284 rows x 2 columns]
+\end{Verbatim}
+            
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}148}]:} \PY{c+c1}{\PYZsh{}This is another sample dataset to show my new desired outcome}
+          
+          \PY{n}{sample2} \PY{o}{=} \PY{p}{\PYZob{}}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{County}\PY{l+s+s1}{\PYZsq{}}\PY{p}{:}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Albany}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Albany}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Albany}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}  \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Cattaragus}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Erie}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Clinton}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Dutchess}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Dutchess}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} 
+                    \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Region}\PY{l+s+s1}{\PYZsq{}}\PY{p}{:}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Capital}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Capital}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Capital}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{WNY}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{WNY}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Eastern ADK}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{LHV}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{LHV}\PY{l+s+s1}{\PYZsq{}}  \PY{p}{]}\PY{p}{\PYZcb{}}
+          \PY{n}{sample\PYZus{}county\PYZus{}reg} \PY{o}{=} \PY{n}{DataFrame} \PY{p}{(}\PY{n}{sample2}\PY{p}{,} \PY{n}{columns} \PY{o}{=} \PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{County}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Region}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{)}
+          \PY{n}{sample\PYZus{}county\PYZus{}reg}
+\end{Verbatim}
+
+
+\begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}148}]:}        County       Region
+          0      Albany      Capital
+          1      Albany      Capital
+          2      Albany      Capital
+          3  Cattaragus          WNY
+          4        Erie          WNY
+          5     Clinton  Eastern ADK
+          6    Dutchess          LHV
+          7    Dutchess          LHV
+\end{Verbatim}
+            
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}149}]:} \PY{n}{reg} \PY{o}{=} \PY{n}{sample\PYZus{}county\PYZus{}reg}\PY{p}{[}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Region}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{]}
+          \PY{n}{reg}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{\PYZsh{} of Veh}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{\PYZsq{}}
+          
+          \PY{n}{sample\PYZus{}county\PYZus{}reg} \PY{o}{=} \PY{n}{reg}\PY{o}{.}\PY{n}{groupby}\PY{p}{(}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Region}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} \PY{n}{as\PYZus{}index} \PY{o}{=} \PY{k+kc}{False}\PY{p}{)}
+          \PY{n}{sample\PYZus{}total\PYZus{}county\PYZus{}reg} \PY{o}{=} \PY{n}{sample\PYZus{}county\PYZus{}reg}\PY{o}{.}\PY{n}{agg}\PY{p}{(}\PY{p}{\PYZob{}}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{\PYZsh{} of Veh}\PY{l+s+s1}{\PYZsq{}}\PY{p}{:}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{count}\PY{l+s+s1}{\PYZsq{}}\PY{p}{\PYZcb{}}\PY{p}{)}\PY{o}{.}\PY{n}{sort\PYZus{}values}\PY{p}{(}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{\PYZsh{} of Veh}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Region}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} \PY{n}{ascending}\PY{o}{=}\PY{p}{[}\PY{k+kc}{False}\PY{p}{,} \PY{k+kc}{True}\PY{p}{]}\PY{p}{)}
+          \PY{n}{sample\PYZus{}total\PYZus{}county\PYZus{}reg}
+          
+          \PY{c+c1}{\PYZsh{}The below table is my desired outcome for this portion of the project}
+\end{Verbatim}
+
+
+\begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}149}]:}         Region  \# of Veh
+          0      Capital         3
+          2          LHV         2
+          3          WNY         2
+          1  Eastern ADK         1
+\end{Verbatim}
+            
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}150}]:} \PY{c+c1}{\PYZsh{}The above method would work, if I could figure out a way to give}
+          \PY{c+c1}{\PYZsh{}each county its corresponding region in the data table above}
+          \PY{c+c1}{\PYZsh{}I am thinking a iterative loop might be the best option?}
+\end{Verbatim}
+
+
+    \section{Charging Hubs}\label{charging-hubs}
 
     \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}7}]:} \PY{n}{veh}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Number of Vehicles}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{\PYZsq{}}
-        \PY{n}{reg\PYZus{}car} \PY{o}{=} \PY{n}{veh}\PY{o}{.}\PY{n}{groupby}\PY{p}{(}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Zip}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{)}
-        \PY{n}{count\PYZus{}car} \PY{o}{=} \PY{n}{reg\PYZus{}car}\PY{o}{.}\PY{n}{agg}\PY{p}{(}\PY{p}{\PYZob{}}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Number of Vehicles}\PY{l+s+s1}{\PYZsq{}}\PY{p}{:}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{count}\PY{l+s+s1}{\PYZsq{}}\PY{p}{\PYZcb{}}\PY{p}{)}\PY{o}{.}\PY{n}{sort\PYZus{}values}\PY{p}{(}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Number of Vehicles}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Zip}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} \PY{n}{ascending}\PY{o}{=}\PY{p}{[}\PY{k+kc}{False}\PY{p}{,} \PY{k+kc}{True}\PY{p}{]}\PY{p}{)}
-        \PY{n}{count\PYZus{}car}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{5}\PY{p}{]}
+{\color{incolor}In [{\color{incolor}151}]:} \PY{n}{charge\PYZus{}hub} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{read\PYZus{}csv}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Electric\PYZus{}Vehicle\PYZus{}Charging\PYZus{}Stations\PYZus{}in\PYZus{}New\PYZus{}York.csv}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+          \PY{n}{charge\PYZus{}hub}\PY{o}{.}\PY{n}{head}\PY{p}{(}\PY{p}{)}
+\end{Verbatim}
+
+
+\begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}151}]:}   Fuel Type Code                                       Station Name  \textbackslash{}
+          0           ELEC  Hudson Valley Community College - TEC-SMART Bu{\ldots}   
+          1           ELEC                                     EDISONPARKFAST   
+          2           ELEC                                        CARCHARGING   
+          3           ELEC                                        CARCHARGING   
+          4           ELEC                                     EDISONPARKFAST   
+          
+            Street Address                            Intersection Directions      City  \textbackslash{}
+          0  345 Hermes Rd                                                NaN     Malta   
+          1    451 9th Ave   LOC \#250 \#2 LOT\#250; ChargePoint America Program  New York   
+          2  350 W 50th St  ICON MERCURY; Icon parking see attendant for a{\ldots}  New York   
+          3  310 W 39th St  ICON 310 W 39TH; Icon Parking systems see vale{\ldots}  New York   
+          4   50 W 44th St  LOC \#100 LEVEL3; Located in basement level of {\ldots}  New York   
+          
+            State    ZIP  Plus4 Station Phone Status Code            {\ldots}              \textbackslash{}
+          0    NY  12020    NaN  518-629-7075           E            {\ldots}               
+          1    NY  10018    NaN  888-758-4389           E            {\ldots}               
+          2    NY  10019    NaN  888-758-4389           E            {\ldots}               
+          3    NY  10018    NaN  888-758-4389           E            {\ldots}               
+          4    NY  10036    NaN  888-758-4389           E            {\ldots}               
+          
+              Latitude  Longitude Date Last Confirmed     ID               Updated At  \textbackslash{}
+          0  42.971670 -73.774182          06/02/2017  36532  2018-02-06 21:00:03 UTC   
+          1  40.754512 -73.995938          10/28/2018  36945  2018-10-28 09:03:02 UTC   
+          2  40.763245 -73.988648          10/28/2018  37169  2018-10-28 09:03:02 UTC   
+          3  40.755440 -73.992027          10/28/2018  38530  2018-10-28 09:03:02 UTC   
+          4  40.755546 -73.982307          10/28/2018  38981  2018-10-28 09:03:02 UTC   
+          
+             Owner Type Code  Federal Agency ID  Federal Agency Name   Open Date  \textbackslash{}
+          0               SG                NaN                  NaN  10/15/2010   
+          1              NaN                NaN                  NaN         NaN   
+          2              NaN                NaN                  NaN         NaN   
+          3              NaN                NaN                  NaN         NaN   
+          4              NaN                NaN                  NaN         NaN   
+          
+                              Location  
+          0     (42.97167, -73.774182)  
+          1    (40.754512, -73.995938)  
+          2  (40.7632446, -73.9886475)  
+          3  (40.7554398, -73.9920273)  
+          4    (40.755546, -73.982307)  
+          
+          [5 rows x 32 columns]
+\end{Verbatim}
+            
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}152}]:} \PY{n}{Zip} \PY{o}{=} \PY{n}{charge\PYZus{}hub}\PY{p}{[}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{ZIP}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{]}
+          \PY{n}{Zip}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{4}\PY{p}{]}
+\end{Verbatim}
+
+
+\begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}152}]:}      ZIP
+          0  12020
+          1  10018
+          2  10019
+          3  10018
+\end{Verbatim}
+            
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}153}]:} \PY{c+c1}{\PYZsh{}upload zip/county cross reference data from NYS open data}
+          
+          \PY{n}{upload} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{read\PYZus{}csv}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{zip\PYZus{}county\PYZus{}cross\PYZus{}reference.csv}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+          \PY{n}{upload}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{5}\PY{p}{]}
+\end{Verbatim}
+
+
+\begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}153}]:}   County Name  State FIPS  County Code  County FIPS  ZIP Code   File Date
+          0      Albany          36            1        36001     12046  07/25/2007
+          1      Albany          36            1        36001     12083  07/25/2007
+          2      Albany          36            1        36001     12085  07/25/2007
+          3      Albany          36            1        36001     12201  07/25/2007
+          4      Albany          36            1        36001     12203  07/25/2007
+\end{Verbatim}
+            
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}154}]:} \PY{n}{zip\PYZus{}county} \PY{o}{=} \PY{n}{upload}\PY{p}{[}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{County Name}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{ZIP Code}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{]}
+          \PY{n}{zip\PYZus{}county}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{5}\PY{p}{]}
+\end{Verbatim}
+
+
+\begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}154}]:}   County Name  ZIP Code
+          0      Albany     12046
+          1      Albany     12083
+          2      Albany     12085
+          3      Albany     12201
+          4      Albany     12203
+\end{Verbatim}
+            
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}155}]:} \PY{c+c1}{\PYZsh{}join zip\PYZus{}county and Zip.  Output will be a datatable that will}
+          \PY{c+c1}{\PYZsh{}give county values to the zip codes where charge hubs are located}
+          
+          \PY{n}{zip\PYZus{}co} \PY{o}{=} \PY{n}{Zip}\PY{o}{.}\PY{n}{merge}\PY{p}{(}\PY{n}{zip\PYZus{}county}\PY{p}{,} \PY{n}{how}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{inner}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{left\PYZus{}on}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{ZIP}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{right\PYZus{}on}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{ZIP Code}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{validate}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{many\PYZus{}to\PYZus{}many}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+          \PY{n}{zip\PYZus{}co}
+\end{Verbatim}
+
+
+\begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}155}]:}         ZIP   County Name  ZIP Code
+          0     12020      Saratoga     12020
+          1     10018      New York     10018
+          2     10018      New York     10018
+          3     10018      New York     10018
+          4     10018      New York     10018
+          5     10018      New York     10018
+          6     10019      New York     10019
+          7     10019      New York     10019
+          8     10019      New York     10019
+          9     10019      New York     10019
+          10    10019      New York     10019
+          11    10019      New York     10019
+          12    10019      New York     10019
+          13    10019      New York     10019
+          14    10019      New York     10019
+          15    10019      New York     10019
+          16    10019      New York     10019
+          17    10019      New York     10019
+          18    10019      New York     10019
+          19    10019      New York     10019
+          20    10019      New York     10019
+          21    10019      New York     10019
+          22    10019      New York     10019
+          23    10019      New York     10019
+          24    10019      New York     10019
+          25    10019      New York     10019
+          26    10019      New York     10019
+          27    10019      New York     10019
+          28    10019      New York     10019
+          29    10019      New York     10019
+          {\ldots}     {\ldots}           {\ldots}       {\ldots}
+          1114  13088      Onondaga     13088
+          1115  13088      Onondaga     13088
+          1116  13088      Onondaga     13088
+          1117  12075      Columbia     12075
+          1118  12075      Columbia     12075
+          1119  12045        Albany     12045
+          1120  13669  St. Lawrence     13669
+          1121  11706       Suffolk     11706
+          1122  10523   Westchester     10523
+          1123  12043        Otsego     12043
+          1124  12043     Schoharie     12043
+          1125  12514      Dutchess     12514
+          1126  14870      Schuyler     14870
+          1127  14870       Steuben     14870
+          1128  11803        Nassau     11803
+          1129  11581        Nassau     11581
+          1130  12047        Albany     12047
+          1131  14760   Cattaraugus     14760
+          1132  11355        Queens     11355
+          1133  11978       Suffolk     11978
+          1134  14485    Livingston     14485
+          1135  14485       Ontario     14485
+          1136  11378        Queens     11378
+          1137  12498        Ulster     12498
+          1138  12498        Ulster     12498
+          1139  11768       Suffolk     11768
+          1140  13320        Otsego     13320
+          1141  13320     Schoharie     13320
+          1142  13320    Montgomery     13320
+          1143  14086          Erie     14086
+          
+          [1144 rows x 3 columns]
+\end{Verbatim}
+            
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}156}]:} \PY{n}{county\PYZus{}hub} \PY{o}{=} \PY{n}{zip\PYZus{}co}\PY{p}{[}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{County Name}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{]}
+          \PY{n}{county\PYZus{}hub}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{County Name}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{n}{county\PYZus{}hub}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{County Name}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{o}{.}\PY{n}{str}\PY{o}{.}\PY{n}{upper}\PY{p}{(}\PY{p}{)}
+          \PY{n}{county\PYZus{}hub}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{5}\PY{p}{]}
+\end{Verbatim}
+
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+/anaconda3/lib/python3.6/site-packages/ipykernel\_launcher.py:2: SettingWithCopyWarning: 
+A value is trying to be set on a copy of a slice from a DataFrame.
+Try using .loc[row\_indexer,col\_indexer] = value instead
+
+See the caveats in the documentation: http://pandas.pydata.org/pandas-docs/stable/indexing.html\#indexing-view-versus-copy
+  
+
+    \end{Verbatim}
+
+\begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}156}]:}   County Name
+          0    SARATOGA
+          1    NEW YORK
+          2    NEW YORK
+          3    NEW YORK
+          4    NEW YORK
+\end{Verbatim}
+            
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}157}]:} \PY{n}{county\PYZus{}reg} \PY{o}{=} \PY{n}{county\PYZus{}hub}\PY{o}{.}\PY{n}{merge}\PY{p}{(}\PY{n}{region}\PY{p}{,} \PY{n}{how}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{inner}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{left\PYZus{}on}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{County Name}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{right\PYZus{}on}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{County}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{validate}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{many\PYZus{}to\PYZus{}many}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+          \PY{n}{county\PYZus{}reg}
+\end{Verbatim}
+
+
+\begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}157}]:}       County Name       County                Region
+          0        SARATOGA     SARATOGA   Eastern Adirondacks
+          1        SARATOGA     SARATOGA   Eastern Adirondacks
+          2        SARATOGA     SARATOGA   Eastern Adirondacks
+          3        SARATOGA     SARATOGA   Eastern Adirondacks
+          4        SARATOGA     SARATOGA   Eastern Adirondacks
+          5        SARATOGA     SARATOGA   Eastern Adirondacks
+          6        SARATOGA     SARATOGA   Eastern Adirondacks
+          7        SARATOGA     SARATOGA   Eastern Adirondacks
+          8        SARATOGA     SARATOGA   Eastern Adirondacks
+          9        SARATOGA     SARATOGA   Eastern Adirondacks
+          10       SARATOGA     SARATOGA   Eastern Adirondacks
+          11       SARATOGA     SARATOGA   Eastern Adirondacks
+          12       SARATOGA     SARATOGA   Eastern Adirondacks
+          13       SARATOGA     SARATOGA   Eastern Adirondacks
+          14       SARATOGA     SARATOGA   Eastern Adirondacks
+          15       SARATOGA     SARATOGA   Eastern Adirondacks
+          16       SARATOGA     SARATOGA   Eastern Adirondacks
+          17       SARATOGA     SARATOGA   Eastern Adirondacks
+          18       SARATOGA     SARATOGA   Eastern Adirondacks
+          19       SARATOGA     SARATOGA   Eastern Adirondacks
+          20       SARATOGA     SARATOGA   Eastern Adirondacks
+          21       SARATOGA     SARATOGA   Eastern Adirondacks
+          22       SARATOGA     SARATOGA   Eastern Adirondacks
+          23       SARATOGA     SARATOGA   Eastern Adirondacks
+          24       SARATOGA     SARATOGA   Eastern Adirondacks
+          25       SARATOGA     SARATOGA   Eastern Adirondacks
+          26       NEW YORK     NEW YORK         New York City
+          27       NEW YORK     NEW YORK         New York City
+          28       NEW YORK     NEW YORK         New York City
+          29       NEW YORK     NEW YORK         New York City
+          {\ldots}           {\ldots}          {\ldots}                   {\ldots}
+          1112     CORTLAND     CORTLAND      Central New York
+          1113       PUTNAM       PUTNAM   Lower Hudson Valley
+          1114       PUTNAM       PUTNAM   Lower Hudson Valley
+          1115       GREENE       GREENE        Capital Region
+          1116       GREENE       GREENE        Capital Region
+          1117       GREENE       GREENE        Capital Region
+          1118       GREENE       GREENE        Capital Region
+          1119      GENESEE      GENESEE  Western Finger Lakes
+          1120      GENESEE      GENESEE  Western Finger Lakes
+          1121      GENESEE      GENESEE  Western Finger Lakes
+          1122      WYOMING      WYOMING      Western New York
+          1123      WYOMING      WYOMING      Western New York
+          1124      ORLEANS      ORLEANS  Western Finger Lakes
+          1125      ORLEANS      ORLEANS  Western Finger Lakes
+          1126  CATTARAUGUS  CATTARAUGUS      Western New York
+          1127  CATTARAUGUS  CATTARAUGUS      Western New York
+          1128   LIVINGSTON   LIVINGSTON  Western Finger Lakes
+          1129   LIVINGSTON   LIVINGSTON  Western Finger Lakes
+          1130   LIVINGSTON   LIVINGSTON  Western Finger Lakes
+          1131   LIVINGSTON   LIVINGSTON  Western Finger Lakes
+          1132     HERKIMER     HERKIMER   Western Adirondacks
+          1133     HERKIMER     HERKIMER   Western Adirondacks
+          1134     HERKIMER     HERKIMER   Western Adirondacks
+          1135     HERKIMER     HERKIMER   Western Adirondacks
+          1136     HERKIMER     HERKIMER   Western Adirondacks
+          1137     HERKIMER     HERKIMER   Western Adirondacks
+          1138       OSWEGO       OSWEGO      Central New York
+          1139    SCHOHARIE    SCHOHARIE        Capital Region
+          1140    SCHOHARIE    SCHOHARIE        Capital Region
+          1141    SCHOHARIE    SCHOHARIE        Capital Region
+          
+          [1142 rows x 3 columns]
+\end{Verbatim}
+            
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}158}]:} \PY{n}{reg\PYZus{}count\PYZus{}hub1} \PY{o}{=} \PY{n}{county\PYZus{}reg}\PY{p}{[}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Region}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{]}
+          \PY{n}{reg\PYZus{}count\PYZus{}hub1}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{5}\PY{p}{]}
+\end{Verbatim}
+
+
+\begin{Verbatim}[commandchars=\\\{\}]
+{\color{outcolor}Out[{\color{outcolor}158}]:}                 Region
+          0  Eastern Adirondacks
+          1  Eastern Adirondacks
+          2  Eastern Adirondacks
+          3  Eastern Adirondacks
+          4  Eastern Adirondacks
+\end{Verbatim}
+            
+    \begin{Verbatim}[commandchars=\\\{\}]
+{\color{incolor}In [{\color{incolor}159}]:} \PY{n}{reg\PYZus{}count\PYZus{}hub1}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Number of Hubs}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{\PYZsq{}}
+          \PY{n}{reg\PYZus{}count\PYZus{}hub2} \PY{o}{=} \PY{n}{reg\PYZus{}count\PYZus{}hub1}\PY{o}{.}\PY{n}{groupby}\PY{p}{(}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Region}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} \PY{n}{as\PYZus{}index} \PY{o}{=} \PY{k+kc}{False}\PY{p}{)}
+          \PY{n}{reg\PYZus{}count\PYZus{}hub} \PY{o}{=} \PY{n}{reg\PYZus{}count\PYZus{}hub2}\PY{o}{.}\PY{n}{agg}\PY{p}{(}\PY{p}{\PYZob{}}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Number of Hubs}\PY{l+s+s1}{\PYZsq{}}\PY{p}{:}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{count}\PY{l+s+s1}{\PYZsq{}}\PY{p}{\PYZcb{}}\PY{p}{)}\PY{o}{.}\PY{n}{sort\PYZus{}values}\PY{p}{(}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Number of Hubs}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Region}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} \PY{n}{ascending}\PY{o}{=}\PY{p}{[}\PY{k+kc}{False}\PY{p}{,} \PY{k+kc}{True}\PY{p}{]}\PY{p}{)}
+          \PY{n}{reg\PYZus{}count\PYZus{}hub}
 \end{Verbatim}
 
 
@@ -430,241 +1027,38 @@ See the caveats in the documentation: http://pandas.pydata.org/pandas-docs/stabl
     \end{Verbatim}
 
 \begin{Verbatim}[commandchars=\\\{\}]
-{\color{outcolor}Out[{\color{outcolor}7}]:}        Number of Vehicles
-        Zip                      
-        10583                 200
-        11746                 114
-        11791                 109
-        10580                 103
-        11743                 101
+{\color{outcolor}Out[{\color{outcolor}159}]:}                  Region  Number of Hubs
+          5         New York City             397
+          4   Lower Hudson Valley             161
+          0        Capital Region             127
+          3           Long Island             115
+          7  Western Finger Lakes              96
+          1      Central New York              84
+          2   Eastern Adirondacks              67
+          8      Western New York              62
+          6   Western Adirondacks              33
 \end{Verbatim}
             
     \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}28}]:} \PY{n}{ax} \PY{o}{=} \PY{n}{sns}\PY{o}{.}\PY{n}{countplot}\PY{p}{(}\PY{n}{x} \PY{o}{=} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Zip}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,} \PY{n}{data} \PY{o}{=} \PY{n}{veh}\PY{p}{)}
-         \PY{n}{ax}\PY{o}{.}\PY{n}{set\PYZus{}xticklabels}\PY{p}{(}\PY{n}{ax}\PY{o}{.}\PY{n}{get\PYZus{}xticklabels}\PY{p}{(}\PY{p}{)}\PY{p}{,} 
-                            \PY{n}{rotation} \PY{o}{=} \PY{l+m+mi}{40}\PY{p}{,} 
-                            \PY{n}{ha}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{right}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
-         \PY{n}{ax}\PY{o}{.}\PY{n}{figure}\PY{o}{.}\PY{n}{set\PYZus{}size\PYZus{}inches}\PY{p}{(}\PY{l+m+mi}{12}\PY{p}{,}\PY{l+m+mi}{4}\PY{p}{)}
-         \PY{n}{ax}\PY{o}{.}\PY{n}{axes}\PY{o}{.}\PY{n}{set\PYZus{}title}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Electric Vehicles Registered by Zip Code in NYS}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}\PY{n}{fontsize}\PY{o}{=}\PY{l+m+mi}{18}\PY{p}{)}
-         \PY{n}{ax}\PY{o}{.}\PY{n}{set\PYZus{}xlabel}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Zip Code}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}\PY{n}{fontsize}\PY{o}{=}\PY{l+m+mi}{12}\PY{p}{)}
-         \PY{n}{ax}\PY{o}{.}\PY{n}{set\PYZus{}ylabel}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Number of Vehicles}\PY{l+s+s2}{\PYZdq{}}\PY{p}{,}\PY{n}{fontsize}\PY{o}{=}\PY{l+m+mi}{12}\PY{p}{)}
-         \PY{c+c1}{\PYZsh{}ax\PYZus{}seg = plt.legend(bbox\PYZus{}to\PYZus{}anchor = (1.05, 1), loc = 2, borderaxespad = 0.)}
-         \PY{n}{plt}\PY{o}{.}\PY{n}{tight\PYZus{}layout}\PY{p}{(}\PY{p}{)} 
-         \PY{n}{plt}\PY{o}{.}\PY{n}{show}\PY{p}{(}\PY{p}{)}
-         \PY{c+c1}{\PYZsh{}The best way to display this would be in GIS}
-\end{Verbatim}
-
-
-    \begin{center}
-    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{output_11_0.png}
-    \end{center}
-    { \hspace*{\fill} \\}
-    
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}9}]:} \PY{n}{vehicle\PYZus{}reg\PYZus{}zip} \PY{o}{=} \PY{n}{vehicle\PYZus{}reg}\PY{o}{.}\PY{n}{groupby}\PY{p}{(}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Zip}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{)}
-        \PY{n}{vrzip} \PY{o}{=} \PY{n}{vehicle\PYZus{}reg\PYZus{}zip}\PY{o}{.}\PY{n}{size}\PY{p}{(}\PY{p}{)}\PY{o}{.}\PY{n}{sort\PYZus{}values}\PY{p}{(}\PY{n}{ascending} \PY{o}{=} \PY{k+kc}{False}\PY{p}{)}
+{\color{incolor}In [{\color{incolor}160}]:} \PY{c+c1}{\PYZsh{}wondering if I can use the same }
+          \PY{c+c1}{\PYZsh{}county\PYZus{}reg = county\PYZus{}hub.merge(region, how=\PYZsq{}inner\PYZsq{}, left\PYZus{}on=\PYZsq{}County Name\PYZsq{}, right\PYZus{}on=\PYZsq{}County\PYZsq{}, validate=\PYZsq{}many\PYZus{}to\PYZus{}many\PYZsq{})}
+          \PY{c+c1}{\PYZsh{}code to merge county and region for the vehicle data?}
 \end{Verbatim}
 
 
     \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}10}]:} \PY{n}{vrzip} \PY{o}{=} \PY{n}{vrzip}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{25}\PY{p}{]}
-         \PY{n}{vrzip}
+{\color{incolor}In [{\color{incolor}161}]:} \PY{c+c1}{\PYZsh{}Question3: Any ideas why this code would turn up an empty dataframe?}
+          \PY{n}{v\PYZus{}c\PYZus{}reg} \PY{o}{=} \PY{n}{county1}\PY{o}{.}\PY{n}{merge}\PY{p}{(}\PY{n}{region}\PY{p}{,} \PY{n}{how}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{inner}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{left\PYZus{}on}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{County}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{right\PYZus{}on}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{County}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,} \PY{n}{validate}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{many\PYZus{}to\PYZus{}many}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+          \PY{n}{v\PYZus{}c\PYZus{}reg}
 \end{Verbatim}
 
 
 \begin{Verbatim}[commandchars=\\\{\}]
-{\color{outcolor}Out[{\color{outcolor}10}]:} Zip
-         10583    200
-         11746    114
-         11791    109
-         10580    103
-         11743    101
-         11050     87
-         10538     81
-         10013     77
-         14850     75
-         10514     73
-         11030     72
-         11576     72
-         14534     67
-         10504     67
-         10011     65
-         10023     60
-         11797     58
-         11747     55
-         11545     54
-         10014     53
-         11733     52
-         10528     51
-         11568     50
-         11201     49
-         10956     48
-         dtype: int64
+{\color{outcolor}Out[{\color{outcolor}161}]:} Empty DataFrame
+          Columns: [County, Region]
+          Index: []
 \end{Verbatim}
             
-    \subsection{Charging Hubs in New York
-State}\label{charging-hubs-in-new-york-state}
-
-\emph{Import and read data}
-
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}11}]:} \PY{n}{charge\PYZus{}hub} \PY{o}{=} \PY{n}{pd}\PY{o}{.}\PY{n}{read\PYZus{}csv}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Electric\PYZus{}Vehicle\PYZus{}Charging\PYZus{}Stations\PYZus{}in\PYZus{}New\PYZus{}York.csv}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
-         \PY{n}{charge\PYZus{}hub}\PY{o}{.}\PY{n}{head}\PY{p}{(}\PY{p}{)}
-\end{Verbatim}
-
-
-\begin{Verbatim}[commandchars=\\\{\}]
-{\color{outcolor}Out[{\color{outcolor}11}]:}   Fuel Type Code                                       Station Name  \textbackslash{}
-         0           ELEC  Hudson Valley Community College - TEC-SMART Bu{\ldots}   
-         1           ELEC                                     EDISONPARKFAST   
-         2           ELEC                                        CARCHARGING   
-         3           ELEC                                        CARCHARGING   
-         4           ELEC                                     EDISONPARKFAST   
-         
-           Street Address                            Intersection Directions      City  \textbackslash{}
-         0  345 Hermes Rd                                                NaN     Malta   
-         1    451 9th Ave   LOC \#250 \#2 LOT\#250; ChargePoint America Program  New York   
-         2  350 W 50th St  ICON MERCURY; Icon parking see attendant for a{\ldots}  New York   
-         3  310 W 39th St  ICON 310 W 39TH; Icon Parking systems see vale{\ldots}  New York   
-         4   50 W 44th St  LOC \#100 LEVEL3; Located in basement level of {\ldots}  New York   
-         
-           State    ZIP  Plus4 Station Phone Status Code            {\ldots}              \textbackslash{}
-         0    NY  12020    NaN  518-629-7075           E            {\ldots}               
-         1    NY  10018    NaN  888-758-4389           E            {\ldots}               
-         2    NY  10019    NaN  888-758-4389           E            {\ldots}               
-         3    NY  10018    NaN  888-758-4389           E            {\ldots}               
-         4    NY  10036    NaN  888-758-4389           E            {\ldots}               
-         
-             Latitude  Longitude Date Last Confirmed     ID               Updated At  \textbackslash{}
-         0  42.971670 -73.774182          06/02/2017  36532  2018-02-06 21:00:03 UTC   
-         1  40.754512 -73.995938          10/28/2018  36945  2018-10-28 09:03:02 UTC   
-         2  40.763245 -73.988648          10/28/2018  37169  2018-10-28 09:03:02 UTC   
-         3  40.755440 -73.992027          10/28/2018  38530  2018-10-28 09:03:02 UTC   
-         4  40.755546 -73.982307          10/28/2018  38981  2018-10-28 09:03:02 UTC   
-         
-            Owner Type Code  Federal Agency ID  Federal Agency Name   Open Date  \textbackslash{}
-         0               SG                NaN                  NaN  10/15/2010   
-         1              NaN                NaN                  NaN         NaN   
-         2              NaN                NaN                  NaN         NaN   
-         3              NaN                NaN                  NaN         NaN   
-         4              NaN                NaN                  NaN         NaN   
-         
-                             Location  
-         0     (42.97167, -73.774182)  
-         1    (40.754512, -73.995938)  
-         2  (40.7632446, -73.9886475)  
-         3  (40.7554398, -73.9920273)  
-         4    (40.755546, -73.982307)  
-         
-         [5 rows x 32 columns]
-\end{Verbatim}
-            
-    \emph{Create a new table with only the relevant information to my study}
-
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}12}]:} \PY{n}{hub} \PY{o}{=} \PY{n}{charge\PYZus{}hub}\PY{p}{[}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{City}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{ZIP}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Latitude}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Longitude}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{p}{]}\PY{p}{]}
-         \PY{n}{hub}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{4}\PY{p}{]}
-\end{Verbatim}
-
-
-\begin{Verbatim}[commandchars=\\\{\}]
-{\color{outcolor}Out[{\color{outcolor}12}]:}        City    ZIP   Latitude  Longitude
-         0     Malta  12020  42.971670 -73.774182
-         1  New York  10018  40.754512 -73.995938
-         2  New York  10019  40.763245 -73.988648
-         3  New York  10018  40.755440 -73.992027
-\end{Verbatim}
-            
-    \emph{There are 1030 charging ports in New York State}
-
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}31}]:} \PY{n+nb}{len}\PY{p}{(}\PY{n}{hub}\PY{p}{)}
-\end{Verbatim}
-
-
-\begin{Verbatim}[commandchars=\\\{\}]
-{\color{outcolor}Out[{\color{outcolor}31}]:} 1030
-\end{Verbatim}
-            
-    \emph{Create a data series showing the number of charging hugs per zip
-code in New York State}
-
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}13}]:} \PY{n}{hub}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Number of Charge Hubs}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]} \PY{o}{=} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{\PYZsq{}}
-         \PY{n}{ch\PYZus{}hub} \PY{o}{=} \PY{n}{hub}\PY{o}{.}\PY{n}{groupby}\PY{p}{(}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{ZIP}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{)}
-         \PY{n}{count\PYZus{}hub} \PY{o}{=} \PY{n}{ch\PYZus{}hub}\PY{o}{.}\PY{n}{agg}\PY{p}{(}\PY{p}{\PYZob{}}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Number of Charge Hubs}\PY{l+s+s1}{\PYZsq{}}\PY{p}{:}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{count}\PY{l+s+s1}{\PYZsq{}}\PY{p}{\PYZcb{}}\PY{p}{)}\PY{o}{.}\PY{n}{sort\PYZus{}values}\PY{p}{(}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Number of Charge Hubs}\PY{l+s+s1}{\PYZsq{}}\PY{p}{,}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{ZIP}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{,} \PY{n}{ascending}\PY{o}{=}\PY{p}{[}\PY{k+kc}{False}\PY{p}{,} \PY{k+kc}{True}\PY{p}{]}\PY{p}{)}
-         \PY{n}{count\PYZus{}hub}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{5}\PY{p}{]}
-\end{Verbatim}
-
-
-    \begin{Verbatim}[commandchars=\\\{\}]
-/anaconda3/lib/python3.6/site-packages/ipykernel\_launcher.py:1: SettingWithCopyWarning: 
-A value is trying to be set on a copy of a slice from a DataFrame.
-Try using .loc[row\_indexer,col\_indexer] = value instead
-
-See the caveats in the documentation: http://pandas.pydata.org/pandas-docs/stable/indexing.html\#indexing-view-versus-copy
-  """Entry point for launching an IPython kernel.
-
-    \end{Verbatim}
-
-\begin{Verbatim}[commandchars=\\\{\}]
-{\color{outcolor}Out[{\color{outcolor}13}]:}        Number of Charge Hubs
-         ZIP                         
-         10019                     34
-         10016                     22
-         12401                     21
-         10021                     17
-         10022                     17
-\end{Verbatim}
-            
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}27}]:} \PY{n}{charge\PYZus{}hub\PYZus{}zip} \PY{o}{=} \PY{n}{charge\PYZus{}hub}\PY{o}{.}\PY{n}{groupby}\PY{p}{(}\PY{p}{[}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{ZIP}\PY{l+s+s1}{\PYZsq{}}\PY{p}{]}\PY{p}{)}
-         \PY{n}{chzip} \PY{o}{=} \PY{n}{charge\PYZus{}hub\PYZus{}zip}\PY{o}{.}\PY{n}{size}\PY{p}{(}\PY{p}{)}\PY{o}{.}\PY{n}{sort\PYZus{}values}\PY{p}{(}\PY{n}{ascending} \PY{o}{=} \PY{k+kc}{False}\PY{p}{)}
-\end{Verbatim}
-
-
-    \begin{Verbatim}[commandchars=\\\{\}]
-{\color{incolor}In [{\color{incolor}30}]:} \PY{n}{chzip} \PY{o}{=} \PY{n}{chzip}\PY{p}{[}\PY{p}{:}\PY{l+m+mi}{25}\PY{p}{]}
-         \PY{n}{chzip}
-\end{Verbatim}
-
-
-\begin{Verbatim}[commandchars=\\\{\}]
-{\color{outcolor}Out[{\color{outcolor}30}]:} ZIP
-         10019    34
-         10016    22
-         12401    21
-         10022    17
-         10021    17
-         10023    16
-         14850    16
-         10065    15
-         12866    15
-         10028    14
-         10011    14
-         10024    13
-         11201    12
-         10025    12
-         10003    12
-         10036    11
-         10014     9
-         14221     9
-         10013     9
-         10075     8
-         11790     8
-         10001     8
-         11901     7
-         12205     7
-         11215     7
-         dtype: int64
-\end{Verbatim}
-            
-    \textbf{Next Steps} 1. Combine count\_car and count\_hub data series
-into one data frame to compare the number of cars in each zip code and
-the number of charging hubs. This will help give an idea of demand for
-hubs. 2. Map number of cars per zip code and the locations of charging
-hubs using geocoding and ArcGIS
-
 
     % Add a bibliography block to the postdoc
     
